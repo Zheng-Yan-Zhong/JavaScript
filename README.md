@@ -2,7 +2,7 @@
 
 ## Table of Contents
 * [**Grammar**](#Grammar)
-    * [Variable](#variable)
+    * [Variable](#Variable)
     * [Data Type](#Data-Type)
     * [Operator](#Operator)
     * [Scope](#Scope)
@@ -10,7 +10,10 @@
     * [Closure](#Closure)
     * [Callback](#Callback)
     * [Promise](#Promise)
+      * [Promise.all](#Promise.all)
+      * [Promise.race](#Promise.race)
     * [Function case](#Function)
+    * [Proxy](#Proxy)
 * [**Algorithm**](#Algorithm)
     * [Big O](#Big-O)
     * [*Search*](#Search)
@@ -77,6 +80,7 @@ const user;
 const user = "Dennis";
 const user = "Jack"
 ```
+
 
 ---
 
@@ -180,8 +184,7 @@ let user = {
 };
 ```
 
-### Dot notation
-
+**Object Dot notation**
 ```javascript
 let user = {
   name: "Dennis",
@@ -190,7 +193,7 @@ let user = {
 console.log(user.name); //"Dennis"
 ```
 
-### Bracket notation
+**Object Bracket notation**
 
 ```javascript
 let user = {
@@ -209,7 +212,7 @@ let list = new Array("A", "B", "C"); // ["A", "B", "C"]
 let list = ["A", "B", "C"]; // ["A", "B", "C"]
 ```
 
-### Index
+**Index**
 
 ```javascript
 let list = ["A", "B", "C"];
@@ -414,6 +417,7 @@ function count(power = 0) {
 }
 const counter = count();
 console.log(counter(3)); //0
+
 const counter = count(3);
 console.log(counter(3)); //9
 ```
@@ -454,24 +458,233 @@ callback(3, (result) => {
 ```
 
 ## Promise
+### syntax
+```javascript
+new Promise((resolve, reject)=> {
+  //conditional
+})
+```
+
+* ES6(ECMA 2015)
+* 解決閉包難以閱讀的語法
+* 更好的非同步方法
+* `then`接受resolve
+* `catch`接受reject
+* `finally`必定回傳
 
 ```javascript
-function getUser() {
-  return new Promise(function (resolve, reject) {
-    let bool = false;
+const promise = () =>
+  new Promise((resolve, reject) => {
+    let count = 10;
+    // setTimeout會進入event queue模擬非同步
     setTimeout(() => {
-      bool = true;
-      if (bool) {
-        resolve("Success");
+      count = 0;
+
+      if (count === 0) {
+        resolve("success");
       } else {
-        reject("error");
+        reject("sorry is crash");
+      }
+    }, 2000);
+  });
+console.log(promise()); //Promise { <pending> }
+```
+
+接著我們需要使用`.then`接收回傳的資料
+```javascript
+promise()
+  //滿足了 resolve函式所以會在
+  .then((res) => console.log(res)) //success
+```
+
+若是符合reject則使用`.catch`捕捉錯誤
+```javascript
+promise()
+  .then((res) => console.log(res)) 
+  .catch((err) => console.log(err)); //sorry is crash
+```
+
+最後使用`.finally`來做處理完畢的提醒
+```javascript
+promise()
+  .then((res) => console.log(res)) 
+  .catch((err) => console.log(err)); //sorry is crash
+  .finally(() => console.log('finished'))
+```
+
+### Promise.all
+* 執行陣列中所有的Promise，且都必須符合才會回傳所有Promise
+
+```javascript=
+const promise1 = () =>
+  new Promise((resolve, reject) => {
+    let count = 10;
+    // setTimeout會進入event queue模擬非同步
+    setTimeout(() => {
+      count = 0;
+      if (count === 0) {
+        resolve("success1");
+      } else {
+        reject("sorry is crash1");
       }
     }, 1000);
   });
+
+const promise2 = () =>
+  new Promise((resolve, reject) => {
+    let count = 10;
+    // setTimeout會進入event queue模擬非同步
+    setTimeout(() => {
+      count = 0;
+
+      if (count === 0) {
+        resolve("success2");
+      } else {
+        reject("sorry is crash2");
+      }
+    }, 2000);
+  });
+
+Promise.all([promise1(), promise2()])
+  .then((res) => console.log(res)) //[ 'success1', 'success2' ]
+  .catch((err) => console.log(err));
+
+```
+
+### Promise.race
+* 比較Promise中最快的，並且回傳該Promise
+
+```javascript
+const promise1 = () =>
+  new Promise((resolve, reject) => {
+    let count = 10;
+    // setTimeout會進入event queue模擬非同步
+    setTimeout(() => {
+      count = 0;
+
+      if (count === 0) {
+        resolve("success1");
+      } else {
+        reject("sorry is crash");
+      }
+    }, 4000);
+  });
+
+const promise2 = () =>
+  new Promise((resolve, reject) => {
+    let count = 10;
+    // setTimeout會進入event queue模擬非同步
+    setTimeout(() => {
+      count = 0;
+
+      if (count === 0) {
+        resolve("success2");
+      } else {
+        reject("sorry is crash");
+      }
+    }, 2000);
+  });
+
+Promise.race([promise1(), promise2()])
+  .then((res) => console.log(res)) //兩個Promise都滿足，但是Promise2比較快，所以回傳Promise2
+  .catch((err) => console.log(err));
+
+```
+
+---
+
+## Function case
+下面的狀況是需要一個蘿蔔一個坑，參數順序完全不能錯誤
+```javascript
+let users = []
+function addUser(name, age, email) {
+	users.push({
+	name: name,
+	age: age,
+	email: email
+	})	
 }
-console.log(getUser());
-//Promise { <pending> } a second after
-//Success
+
+addUser("Dennis",23, "test@gmail.com")
+
+console.log(users)
+/* 
+[{
+  age: 23,
+  email: "test@gmail.com",
+  name: "Dennis"
+}]
+*/
+```
+
+而我們如果使用物件傳遞參數可以避免未來參數增加造成順序傳遞的問題
+
+```javascript
+let users = []
+const obj = {
+	name: "Dennis",
+	age: 23,
+	email: "test@gmail.com"
+}
+function addUser({name, age, email}) {
+	users.push({
+	name: name,
+	age: age,
+	email: email
+	})	
+}
+
+addUser(obj)
+
+console.log(users)
+/* 
+[{
+  age: 23,
+  email: "test@gmail.com",
+  name: "Dennis"
+}]
+*/
+
+```
+
+## Proxy
+### syntax
+```javascript
+  new Proxy(target, handler)
+```
+
+* 代理變數並且做任何的操作
+* [Proxy MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/get)
+* Vue3使用Proxy進行包裹
+
+--- 
+
+```javascript
+const spec = {};
+const specProxy = new Proxy(spec, {});
+specProxy.ram = "4G";
+console.log(spec); //{ ram: '4G' }
+```
+
+下面使用Proxy提供的方法進行操作
+* get
+* set
+
+```javascript
+const spec = {weight: "200g", ram: "3G"};
+const specProxy = new Proxy(spec, {
+  get: (target, property) => {
+    return property in target ? target[property] : null;
+  },
+  set: (target, property, value) => {
+    //只提供修改weight
+    if (property === "weight") {
+      target[property] = value;
+    } 
+  },
+});
+specProxy.ram = "4G";
+console.log("spec", specProxy); //{weight: "200g", ram: "3G"}
 ```
 
 ---
