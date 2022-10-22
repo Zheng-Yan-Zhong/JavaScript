@@ -18,7 +18,7 @@
     * [Big O](#Big-O)
     * [*Search*](#Search)
         * [Linear Search](#Linear-Search)
-        * [Binary Search]()
+        * [Binary Search](#Binary-Search)
     * *Sort*
         * [Bubble Sort]()
         * [Insertion Sort]()
@@ -790,8 +790,57 @@ console.log(index) //2
 ## Binary Search
 * 時間複雜度 `O(nlogn)`
 
-## Recursion
+```javascript
+const arr = [3, 6, 8, 12, 20, 21];
 
+function binarySearch(arr, target) {
+  let left = 0;
+  let right = arr.length - 1;
+  let middle;
+  while (left <= right) {
+    middle = Math.floor(left + right / 2);
+    if (arr[middle] > target) {
+      right = middle;
+    } else if (arr[middle] < target) {
+      left = middle;
+    } else {
+      return middle;
+    }
+  }
+}
+
+const index = binarySearch(arr, 20);
+console.log(index); // 4
+```
+## Recursion
+* Recursion的核心觀念為透過呼叫自身函數
+
+```javascript
+function recursion(num) {
+  if (num > 0) {
+    console.log(num);
+  } else {
+    console.log("end");
+    return;
+  }
+  //每次傳入 num -1 
+  return recursion(num - 1);
+}
+
+recursion(5);
+/*
+  5 -> 4 -> 3 -> 2 -> 1 -> end
+*/
+```
+
+由於遞迴的資料結構為堆疊(Stack)所以會是先進後出(FILO)
+```javascript
+ recursion(5) 
+    recursion(4) 
+      recursion(3)
+        recursion(2)
+          recursion(1)
+```
 ## Sort
 
 ---
