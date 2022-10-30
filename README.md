@@ -843,6 +843,158 @@ recursion(5);
 ```
 ## Sort
 
+### Bubble Sort
+* O(n^2)
+
+![](https://i.imgur.com/QHW98e0.gif)
+
+
+```javascript
+const arr = [3, 10, 1, 0];
+
+function bubbleSort(arr) {
+  for (let i = 0; i < arr.length - 1; i++) {
+    for (let j = 0; j < arr.length - 1; j++) {
+      swap(arr, j, j + 1);
+    }
+  }
+  function swap(array, prev, current) {
+    if (array[current] < array[prev]) {
+      let temp = array[prev];
+      array[prev] = array[current];
+      array[current] = temp;
+    }
+  }
+  return arr;
+}
+
+const result = bubbleSort(arr);
+console.log(result); //[ 0, 1, 3, 10 ]
+```
+
+---
+
+### Selection Sort
+* O(n^2)
+
+
+```javascript
+const arr = [1, 3, 0, 10, 2];
+
+function selectionSort(arr) {
+  let store = [];
+  for (let i = 0; i < arr.length; i++) {
+    let minIndex = i;
+    for (let j = i + 1; j < arr.length; j++) {
+      if (arr[j] < arr[minIndex]) {
+        minIndex = j;
+      }
+    }
+    //swap
+    console.log(store);
+    /*
+      [ 0 ]
+      [ 0, 1 ]
+      [ 0, 1, 2 ]
+      [ 0, 1, 2, 3 ]
+      [ 0, 1, 2, 3, 10 ]
+    */
+    store.push(arr[minIndex]);
+    let temp = arr[minIndex];
+    arr[minIndex] = arr[i];
+    arr[i] = temp;
+  }
+  return store;
+}
+
+const result = selectionSort(arr);
+console.log(result);
+
+
+```
+
+### Insertion Sort
+
+```javascript
+
+
+```
+
+### Merge Sort
+* **分而治之，大問題切分各個小問題**
+* **O(nlogn)**
+
+![](https://i.imgur.com/Mc8DK1I.gif)
+> https://ithelp.ithome.com.tw/articles/10241640
+
+看到上面的GIF可以發現，利用遞迴的方式切割成每個單一數值，最後再進行合併。
+
+
+我們先從合併開始寫起，這邊要注意左和右都必須是已排序過的陣列
+```javascript
+function merge(left, right) {
+  let i = 0; 
+  let j = 0;
+  let temp = [];
+  while (i < left.length && j < right.length) {
+    console.log("temp");
+    console.log(temp);
+    if (left[i] < right[j]) {
+      temp.push(left[i]);
+      i++;
+    }
+    if (right[j] < left[i]) {
+      temp.push(right[j]);
+      j++;
+    }
+  }
+// 避免左或右還有未排序的數值
+  while (i < left.length) {
+    temp.push(left[i]);
+    i++;
+  }
+
+  while (j < right.length) {
+    temp.push(right[j]);
+    j++;
+  }
+  return temp;
+}
+```
+接著是遞迴切割
+```javascript
+function mergeSort(arr) {
+  if (arr.length == 1) {
+    return arr;
+  }
+  let left = arr.slice(0, Math.floor(arr.length / 2));
+  let right = arr.slice(Math.floor(arr.length / 2, 0));
+  return merge(mergeSort(left), mergeSort(right));
+}
+```
+
+```javascript
+arr [ 3, 5, 10, 2, 0 ]
+arr [ 3, 5 ]
+arr [ 3 ]
+arr [ 5 ]
+left [ 3 ]
+right [ 5 ]
+arr [ 10, 2, 0 ]
+arr [ 10 ]
+arr [ 2, 0 ]
+arr [ 2 ]
+arr [ 0 ]
+left [ 2 ]
+right [ 0 ]
+left [ 10 ]
+right [ 0, 2 ]
+left [ 3, 5 ]
+right [ 0, 2, 10 ]
+
+result [ 0, 2, 3, 5, 10 ]
+```
+
 ---
 
 # Data Structure
