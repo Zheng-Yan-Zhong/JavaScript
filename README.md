@@ -14,6 +14,10 @@
       * [Promise.race](#Promise.race)
     * [Function case](#Function)
     * [Proxy](#Proxy)
+    * [Module](#Module)
+      * [MJS](#MJS)
+      * [CJS](#CJS)
+    * [try...catch](#Try…Catch)
 * [**Algorithm**](#Algorithm)
     * [Big O](#Big-O)
     * [*Search*](#Search)
@@ -686,6 +690,102 @@ const specProxy = new Proxy(spec, {
 specProxy.ram = "4G";
 console.log("spec", specProxy); //{weight: "200g", ram: "3G"}
 ```
+
+---
+
+## Module
+### MJS
+* `import`、`export`
+* 檔案若不使用.mjs -> .js，則package.json中必須設定`type: module`
+```javascript=
+//sayHi.mjs
+function sayHi() {
+  console.log("hello");
+}
+
+const initData = {
+  date: "2023-01-01",
+};
+export default sayHi;
+export { initData };
+```
+```javascript=
+import sayHiFunction from "./sayHi.mjs";
+import { initData } from "./sayHi.mjs";
+sayHiFunction();
+console.log(initData);
+```
+
+![](https://i.imgur.com/bOf1UDT.png)
+
+### CJS
+* NodeJS常用
+```javascript=
+//sayHi.cjs
+function sayHi() {
+  console.log("hello");
+}
+
+const initData = {
+  date: "2023-01-01",
+};
+module.exports = sayHi;
+module.exports = {
+  sayHi,
+  initData,
+};
+```
+
+```javascript=
+//main.cjs
+const sayHiAction = require("./sayHi.cjs");
+sayHiAction.sayHi();
+
+console.log(sayHiAction.initData);
+```
+![](https://i.imgur.com/krEbC4k.png)
+
+---
+
+## Try...Catch
+```javascript=
+function getData() {
+  return new Promise((resolve, reject) => {
+    let data;
+    //模擬非同步
+    setTimeout(() => {
+      data = 1;
+      if (data) {
+        if (data > 2) {
+          return resolve(data);
+        } else {
+          return reject("data less than 2");
+        }
+      } else {
+        return reject("empty data");
+      }
+    }, 2000);
+  });
+}
+
+async function initApplication() {
+  try {
+    await getData();
+    //error 斷掉並且不會執行以下函式
+    console.log("initApplication");
+  } catch (err) {
+    console.log("error", err);
+  } finally {
+    console.log("end");
+  }
+}
+
+initApplication();
+
+```
+
+![](https://i.imgur.com/V2dVd3u.png)
+
 
 ---
 
