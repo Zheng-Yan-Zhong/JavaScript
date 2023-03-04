@@ -18,6 +18,11 @@
       * [MJS](#MJS)
       * [CJS](#CJS)
     * [try...catch](#Try…Catch)
+    * [Class](#Class)
+      * [static](#static)
+      * [extends](#extends)
+      * [override property](#override-property)
+      * [override method](#override-method)
 * [**Algorithm**](#Algorithm)
     * [Big O](#Big-O)
     * [*Search*](#Search)
@@ -51,6 +56,9 @@
 ```javascript
 // [v]
 var user;
+const user = {
+  
+}
 // [v]
 var user = "Dennis";
 var user = "Admin";
@@ -786,6 +794,182 @@ initApplication();
 
 ![](https://i.imgur.com/V2dVd3u.png)
 
+---
+
+
+
+## Class
+* contructor
+* super
+* extends
+* static
+
+
+在Class中定義屬性，必須使用`constructor`定義參數，並且最後使用`new`建立**實體(instance)**
+```javascript
+class Student {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+
+  sayHi() {
+    return `Hello I'm ${this.name}`;
+  }
+}
+const std1 = new Student("Dennis", 23); //建立實體
+
+console.log(std1.sayHi()); //Hello I'm Dennis
+```
+
+### static
+在類別中定義該函式為static，則建立實體後無法使用
+
+```javascript
+class Student {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+  static printParameter() {
+    console.log("name and age");
+  }
+
+  sayHi() {
+    return `Hello I'm ${this.name}`;
+  }
+}
+const std1 = new Student("Dennis", 23);
+
+console.log(std1.sayHi()); //Hello I'm Dennis
+Student.printParameter(); // name and age
+```
+
+### extends
+```javascript
+class Student {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+  static printParameter() {
+    console.log("name and age");
+  }
+
+  sayHi() {
+    return `Hello I'm ${this.name}`;
+  }
+}
+
+class ClassLeader extends Student {}
+
+const classALeader = new ClassLeader("Jason", 18);
+
+console.log(classALeader.sayHi());
+```
+
+### override property 
+
+假設今天我在班長的類別想要增加`sex`的屬性：
+
+```javascript
+class Student {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+  static printParameter() {
+    console.log("name and age");
+  }
+
+  sayHi() {
+    return `Hello I'm ${this.name}`;
+  }
+}
+
+class ClassLeader extends Student {
+  constructor(sex) {
+    this.sex = sex;
+  }
+}
+const classALeader = new ClassLeader("Jason", 18, "male");
+
+console.log(classALeader.sayHi()); 
+
+//ReferenceError: Must call super constructor in derived class before accessing 'this' or returning from derived constructor
+```
+
+必須在`ClassLeader`中使用建構子，並且使用`super`繼承該屬性
+
+
+>這邊要注意`super`一定要在繼承類別中定義屬性的第一行
+
+```javascript
+class Student {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+  static printParameter() {
+    console.log("name and age");
+  }
+
+  sayHi() {
+    return `Hello I'm ${this.name}`;
+  }
+}
+
+class ClassLeader extends Student {
+  constructor(name, age, sex) {
+    super(name, age); //一定要在第一行
+    this.sex = sex;
+  }
+}
+const classALeader = new ClassLeader("Jason", 18, "male");
+
+console.log(classALeader.sayHi()); //Hello I'm Jason
+```
+
+如果怕繼承寫錯繼承屬性我們可以使用參數的方式
+```javascript
+class ClassLeader extends Student {
+  constructor(argus, sex) {
+    super(argus); //帶入參數
+    this.sex = sex;
+  }
+}
+```
+
+### override method
+直接在繼承類別中定義相同命名的函式即可
+```javascript
+class Student {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+  static printParameter() {
+    console.log("name and age");
+  }
+
+  sayHi() {
+    return `Hello I'm ${this.name}`;
+  }
+}
+
+class ClassLeader extends Student {
+  constructor(argus, sex) {
+    super(argus);
+    this.sex = sex;
+  }
+  sayHi() {
+    return "ClassLeader";
+  }
+}
+const classALeader = new ClassLeader("Jason", 18, "male");
+
+console.log(classALeader.sayHi()); //ClassLeader
+```
 
 ---
 
