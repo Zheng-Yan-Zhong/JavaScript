@@ -12,7 +12,8 @@
     * [Promise](#Promise)
       * [Promise.all](#Promise.all)
       * [Promise.race](#Promise.race)
-    * [Function case](#Function)
+    * [Async await](#Async-await)
+    * [Function case](#Function-case)
     * [Proxy](#Proxy)
     * [Module](#Module)
       * [MJS](#MJS)
@@ -527,7 +528,7 @@ promise()
 ### Promise.all
 * 執行陣列中所有的Promise，且都必須符合才會回傳所有Promise
 
-```javascript=
+```javascript
 const promise1 = () =>
   new Promise((resolve, reject) => {
     let count = 10;
@@ -699,13 +700,108 @@ specProxy.ram = "4G";
 console.log("spec", specProxy); //{weight: "200g", ram: "3G"}
 ```
 
+## Async await
+* Async 宣告函式為非同步
+* await 等待並且完成才繼續執行
+
+以下是一般使用Promise的寫法，並且使用.then取得Promise資料
+```javascript
+function getUsers() {
+  let data = [];
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      data.push("Dennis");
+      data.push("Anne");
+
+      if (data.length > 0) {
+        resolve(data);
+      } else {
+        reject("no data");
+      }
+    }, 1000);
+  });
+}
+getUsers().then((data) => console.log(data)); //[ 'Dennis', 'Anne' ]
+```
+
+但是如果每寫一個Promise都需要使用.then可能不是很美觀，在ES7新增了Async的語法糖，本質上輔助Promise，因為沒有Promise就不需要Async語法糖
+
+這邊有兩個Promise函式，分別是getUsers、getUsers2
+```javascript
+function getUsers() {
+  let data = [];
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      data.push("Dennis");
+      data.push("Anne");
+
+      if (data.length > 0) {
+        resolve(data);
+      } else {
+        reject("no data");
+      }
+    }, 1000);
+  });
+}
+
+function getUsers2() {
+  let data = [];
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      data.push("Jason");
+      data.push("May");
+
+      if (data.length > 0) {
+        resolve(data);
+      } else {
+        reject("no data");
+      }
+    }, 1000);
+  });
+}
+```
+
+使用async宣告函式， await依序等待
+
+```javascript
+async function initApplication() {
+  const data = await getUsers();
+  const data2 = await getUsers2();
+  console.log(data, data2); //[ 'Dennis', 'Anne' ] [ 'Jason', 'May' ]
+}
+
+initApplication();
+```
+
+當然我們可以使用Promise.all美化程式碼，由於使用Promise.all所以若是有任一 reject，則會回報錯誤，若成功回傳陣列
+```javascript
+async function initApplication() {
+  const data = await Promise.all([getUsers(), getUsers2()]);
+  console.log(data); //[[ 'Dennis', 'Anne' ] [ 'Jason', 'May' ]]
+}
+
+initApplication();
+```
+搭配Try...catch確保程式可以完整執行
+```javascript
+async function initApplication() {
+  try {
+    const data = await Promise.all([getUsers(), getUsers2()]);
+    console.log(data); //[[ 'Dennis', 'Anne' ] [ 'Jason', 'May' ]]
+  } catch (err) {
+    console.log("err", err);
+  }
+}
+initApplication();
+```
+
 ---
 
 ## Module
 ### MJS
 * `import`、`export`
 * 檔案若不使用.mjs -> .js，則package.json中必須設定`type: module`
-```javascript=
+```javascript
 //sayHi.mjs
 function sayHi() {
   console.log("hello");
@@ -717,7 +813,7 @@ const initData = {
 export default sayHi;
 export { initData };
 ```
-```javascript=
+```javascript
 import sayHiFunction from "./sayHi.mjs";
 import { initData } from "./sayHi.mjs";
 sayHiFunction();
@@ -728,7 +824,7 @@ console.log(initData);
 
 ### CJS
 * NodeJS常用
-```javascript=
+```javascript
 //sayHi.cjs
 function sayHi() {
   console.log("hello");
@@ -744,7 +840,7 @@ module.exports = {
 };
 ```
 
-```javascript=
+```javascript
 //main.cjs
 const sayHiAction = require("./sayHi.cjs");
 sayHiAction.sayHi();
@@ -756,7 +852,10 @@ console.log(sayHiAction.initData);
 ---
 
 ## Try...Catch
-```javascript=
+* **try** 
+* **catch** 可帶入參數
+* **finally** 
+```javascript
 function getData() {
   return new Promise((resolve, reject) => {
     let data;
@@ -789,9 +888,7 @@ async function initApplication() {
 }
 
 initApplication();
-
 ```
-
 ![](https://i.imgur.com/V2dVd3u.png)
 
 ---
@@ -1004,7 +1101,7 @@ Big O是演算法中用來計算時間複雜度(time complexity)及空間複雜�
 使用不嚴謹(unnecessary)及模糊(freezy)的方式通常以最大程度影響複雜度的為主，其餘則忽略不計。
 
 舉個例子:
-```javascript=
+```javascript
 function timeComplexity(n) {
     for(let i = 0; i < n; i++) {
         console.log('running')
